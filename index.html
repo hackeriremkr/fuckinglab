@@ -702,11 +702,13 @@
     }
     words.forEach(function(w){
       var i = parseInt(w.getAttribute('data-press'),10);
-      w.addEventListener('mouseenter', function(){ show(i); });
+      /* 데스크톱: 호버로 열림 (터치에서는 click만 동작하도록 pointerType 구분) */
+      w.addEventListener('pointerenter', function(e){ if(e.pointerType === 'mouse') show(i); });
       w.addEventListener('click', function(){ current === i ? hide() : show(i); });
-      w.addEventListener('focus', function(){ show(i); });
     });
-    document.getElementById('press').addEventListener('mouseleave', function(){ hide(); });
+    document.getElementById('press').addEventListener('pointerleave', function(e){
+      if(e.pointerType === 'mouse') hide();
+    });
   })();
 
   /* 스테이트먼트 단어 하이라이트 */
