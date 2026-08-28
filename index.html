@@ -159,6 +159,44 @@
   .nav.on-dark .btn-black{background:#fff;color:var(--ink)}
   .nav.on-dark .btn-black:hover{background:rgba(255,255,255,.85)}
 
+  /* 모바일 풀스크린 메뉴 */
+  .menu-btn{
+    width:40px;height:40px;display:grid;place-items:center;align-content:center;gap:5px;
+    color:var(--ink);
+  }
+  .nav.on-dark .menu-btn, .nav.menu-open .menu-btn{color:#fff}
+  .menu-btn span{display:block;width:20px;height:2px;background:currentColor;border-radius:2px;transition:transform .3s cubic-bezier(.16,1,.3,1)}
+  .menu-btn.x span:nth-child(1){transform:translateY(3.5px) rotate(45deg)}
+  .menu-btn.x span:nth-child(2){transform:translateY(-3.5px) rotate(-45deg)}
+  .nav.menu-open{background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none}
+  .nav.menu-open .logo-img{filter:invert(1) brightness(1.7)}
+  .nav.menu-open .nav-link{color:rgba(255,255,255,.6)}
+  .nav.menu-open .btn-black{background:#fff;color:var(--ink)}
+  .m-menu{
+    position:fixed;inset:0;z-index:40;background:var(--black);
+    display:flex;flex-direction:column;justify-content:center;
+    padding:60px 2.1rem 2rem;
+    opacity:0;pointer-events:none;transition:opacity .35s ease;
+  }
+  .m-menu.open{opacity:1;pointer-events:auto}
+  .m-menu-links{display:flex;flex-direction:column}
+  .m-menu-links a{
+    color:#fff;font-size:2.15rem;font-weight:800;letter-spacing:-.03em;
+    padding:.6rem 0;border-bottom:1px solid rgba(255,255,255,.08);
+    opacity:0;transform:translateY(20px);
+    transition:opacity .5s cubic-bezier(.16,1,.3,1),transform .5s cubic-bezier(.16,1,.3,1);
+  }
+  .m-menu.open .m-menu-links a{opacity:1;transform:none}
+  .m-menu.open .m-menu-links a:nth-child(1){transition-delay:.06s}
+  .m-menu.open .m-menu-links a:nth-child(2){transition-delay:.12s}
+  .m-menu.open .m-menu-links a:nth-child(3){transition-delay:.18s}
+  .m-menu.open .m-menu-links a:nth-child(4){transition-delay:.24s}
+  .m-menu.open .m-menu-links a:nth-child(5){transition-delay:.3s}
+  .m-menu-foot{margin-top:2.4rem;font-size:12px;color:rgba(245,245,249,.4);letter-spacing:.06em}
+  @media (prefers-reduced-motion:reduce){
+    .m-menu, .m-menu-links a{transition:none}
+  }
+
   .grad-text{
     background:linear-gradient(100deg,#191F28 20%,#98A1AE 40%,#191F28 60%);
     background-size:280% 100%;
@@ -193,7 +231,7 @@
   /* ── 스크롤 연동 마퀴 ── */
   .band{overflow:hidden;padding:1.2rem 0}
   .band-track{white-space:nowrap;will-change:transform;font-weight:650;letter-spacing:-.035em;line-height:1;
-    font-size:clamp(3.4rem,9vw,7.5rem);user-select:none}
+    font-size:clamp(2.7rem,9vw,7.5rem);user-select:none}
   .band-outline{color:#EBEEF2}
   .band-solid{color:var(--line)}
   .band-grad{color:var(--ink)}
@@ -214,7 +252,7 @@
 
   /* ── 서비스 카드 ── */
   .svc{
-    position:relative;background:#fff;border-radius:28px;padding:2.2rem;
+    position:relative;background:#fff;border-radius:24px;padding:1.6rem 1.5rem;
     transition:transform .18s ease-out,box-shadow .35s;
     transform-style:preserve-3d;will-change:transform;
   }
@@ -225,6 +263,7 @@
     -webkit-mask-composite:xor;mask-composite:exclude;
     pointer-events:none;
   }
+  @media (min-width:768px){.svc{border-radius:28px;padding:2.2rem}}
   .svc:hover{box-shadow:0 24px 50px -20px rgba(25,31,40,.22)}
   .svc:hover::before{opacity:1}
   .svc-glyph{font-weight:900;letter-spacing:-.05em;line-height:1;color:var(--line);font-size:3.4rem;user-select:none;transition:all .35s}
@@ -267,11 +306,15 @@
   /* Geeks 타이포 전용 */
   .geek-h{
     font-weight:900;letter-spacing:-.045em;line-height:1.08;
-    font-size:clamp(2.5rem,7.4vw,6rem);
+    font-size:clamp(2.05rem,7.4vw,6rem);
     cursor:default;user-select:none;
   }
   .geek-meta{color:rgba(245,245,249,.5);font-size:13.5px;font-weight:500;letter-spacing:.01em}
   .geek-meta b{color:#F5F5F9;font-weight:700}
+  @media (max-width:640px){
+    .geek-meta{font-size:12px}
+    .geek-dot{margin:0 .4rem}
+  }
   .geek-dot{color:#80E54D;margin:0 .65rem}
   .geek-link{
     color:#80E54D;font-weight:800;font-size:clamp(15px,2vw,18px);
@@ -345,7 +388,7 @@
   .foot-k{color:var(--muted);min-width:7.5rem;display:inline-block}
   .foot-giant{
     font-weight:900;letter-spacing:-.05em;line-height:.82;
-    font-size:clamp(4.6rem,15vw,13rem);white-space:nowrap;
+    font-size:clamp(3.2rem,15vw,13rem);white-space:nowrap;
     background:linear-gradient(180deg,var(--line2),rgba(229,232,235,0));
     -webkit-background-clip:text;background-clip:text;color:transparent;
     user-select:none;will-change:transform;
@@ -379,9 +422,25 @@
       <a class="nav-link" href="#geeks">GEEKs</a>
       <a class="nav-link" href="#press">뉴스</a>
     </div>
-    <a href="#contact" class="btn-black rounded-full px-5 py-2 text-[13.5px]">문의하기</a>
+    <div class="flex items-center gap-1.5">
+      <a href="#contact" class="btn-black rounded-full px-5 py-2 text-[13.5px]">문의하기</a>
+      <button id="menuBtn" class="menu-btn md:hidden" aria-label="메뉴" aria-expanded="false">
+        <span></span><span></span>
+      </button>
+    </div>
   </nav>
 </header>
+
+<div id="mMenu" class="m-menu md:hidden" aria-hidden="true">
+  <nav class="m-menu-links">
+    <a href="#about">회사소개</a>
+    <a href="#services">프로젝트</a>
+    <a href="#geeks">GEEKs</a>
+    <a href="#press">뉴스</a>
+    <a href="#contact">문의하기</a>
+  </nav>
+  <p class="m-menu-foot">사람에 기술을 더하다 — KIKILAB</p>
+</div>
 
 <!-- ═════════ HERO ═════════ -->
 <section id="top" class="hero-dark min-h-[100svh] relative flex flex-col items-center justify-center text-center px-5 overflow-hidden">
@@ -723,6 +782,8 @@
     window.addEventListener('pointerleave', function(){ mx = my = -9e4; });
 
     var SIGMA2 = 2*110*110;
+    var FINE = window.matchMedia('(pointer:fine)').matches;
+    var KBASE = FINE ? 330 : 620, KAMP = FINE ? 110 : 170;
     function tick(t){
       var winH = window.innerHeight;
       groups.forEach(function(g){
@@ -734,8 +795,8 @@
           var cx = r.left + r.width/2, cy = r.top + r.height/2;
           var dx = cx-mx, dy = cy-my;
           var boost = 640 * Math.exp(-(dx*dx+dy*dy)/SIGMA2);
-          /* 기본은 가는 굵기로 은은하게 물결, 커서가 닿으면 부풀어 오름 */
-          var idle = 330 + 110*Math.sin(t/900 + i*.6);
+          /* 기본은 가는 굵기로 물결, 커서가 닿으면 부풀어 오름 (터치 기기는 굵은 물결) */
+          var idle = KBASE + KAMP*Math.sin(t/900 + i*.6);
           var w = Math.min(900, idle + boost);
           c.style.fontVariationSettings = "'wght' " + w.toFixed(0);
         }
@@ -743,6 +804,22 @@
       requestAnimationFrame(tick);
     }
     requestAnimationFrame(tick);
+  })();
+
+  /* 모바일 메뉴 */
+  (function(){
+    var mb = document.getElementById('menuBtn'), mm = document.getElementById('mMenu');
+    if(!mb || !mm) return;
+    function setMenu(o){
+      mm.classList.toggle('open', o);
+      nav.classList.toggle('menu-open', o);
+      mb.classList.toggle('x', o);
+      mb.setAttribute('aria-expanded', o);
+      mm.setAttribute('aria-hidden', !o);
+      document.documentElement.style.overflow = o ? 'hidden' : '';
+    }
+    mb.addEventListener('click', function(){ setMenu(!mm.classList.contains('open')); });
+    mm.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', function(){ setMenu(false); }); });
   })();
 
   /* 프레스: 호버/클릭 시 보도자료 카드 */
