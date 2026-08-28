@@ -126,6 +126,20 @@
   }
   .cur-ring.on{width:52px;height:52px}
 
+  /* 맨 위로 */
+  .totop{
+    position:fixed;right:22px;bottom:22px;z-index:70;
+    width:46px;height:46px;border-radius:99px;
+    background:var(--ink);color:#fff;font-size:17px;
+    display:grid;place-items:center;
+    opacity:0;pointer-events:none;transform:translateY(14px);
+    transition:opacity .35s ease,transform .35s ease,background .2s;
+    box-shadow:0 12px 30px -12px rgba(25,31,40,.5);
+  }
+  .totop.show{opacity:1;pointer-events:auto;transform:none}
+  .totop:hover{background:#333D4B}
+  #rotor{will-change:transform}
+
   /* 다크 히어로 위의 내비게이션 */
   .nav.on-dark{background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none}
   .nav.on-dark .nav-link{color:rgba(255,255,255,.6)}
@@ -161,8 +175,9 @@
   .rv-d1{transition-delay:.08s}.rv-d2{transition-delay:.16s}.rv-d3{transition-delay:.24s}
   .rv-scale{opacity:0;transform:scale(.94);transition:opacity 1s cubic-bezier(.16,1,.3,1),transform 1s cubic-bezier(.16,1,.3,1)}
   .rv-scale.in{opacity:1;transform:none}
-  .rv-mask{clip-path:inset(0 0 102% 0);transform:translateY(.4em);transition:clip-path 1s cubic-bezier(.16,1,.3,1),transform 1s cubic-bezier(.16,1,.3,1)}
-  .rv-mask.in{clip-path:inset(-8% 0 -12% 0);transform:none}
+  .rv-mask{display:block;overflow:hidden;padding-bottom:.08em}
+  .rv-mask .mask-inner{display:block;transform:translateY(118%);transition:transform 1s cubic-bezier(.16,1,.3,1)}
+  .rv-mask.in .mask-inner{transform:none}
 
   /* ── 스크롤 연동 마퀴 ── */
   .band{overflow:hidden;padding:1.2rem 0}
@@ -326,13 +341,14 @@
     .scroll-cue::after,.aurora-1,.aurora-2,.aurora-3,.grad-text,.grad-text-dark,.cta-ring{animation:none}
     .rv,.rv-scale{opacity:1;transform:none;transition:none}
     .statement .w{color:var(--ink);opacity:1;filter:none;transform:none;transition:none}
-    .rv-mask{clip-path:none;transform:none;transition:none}
+    .rv-mask .mask-inner{transform:none;transition:none}
     html{scroll-behavior:auto}
   }
   a:focus-visible,button:focus-visible{outline:2px solid var(--ink);outline-offset:3px;border-radius:8px}
 </style>
 
 <div id="progress" aria-hidden="true"></div>
+<button id="toTop" class="totop" aria-label="맨 위로">↑</button>
 <div class="grain" aria-hidden="true"></div>
 
 <!-- ═════════ NAV ═════════ -->
@@ -396,7 +412,7 @@
     <div id="hSticky" class="lg:sticky lg:top-0 lg:h-screen lg:overflow-hidden py-24 md:py-32 lg:py-0 lg:flex lg:flex-col lg:justify-center">
       <div class="mx-auto max-w-6xl px-5 md:px-8 w-full mb-10 lg:mb-12">
         <p class="sec-label mb-3">BUSINESS</p>
-        <h2 class="sec-h2 balance rv-mask">키키랩이 하는 일</h2>
+        <h2 class="sec-h2 balance rv-mask"><span class="mask-inner">키키랩이 하는 일</span></h2>
         <p class="mt-4 text-[15px] font-medium" style="color:var(--sub)">기획부터 개발, 운영까지. IT라면 가리지 않습니다.</p>
       </div>
       <div id="hTrack" class="flex flex-col lg:flex-row lg:flex-nowrap gap-4 md:gap-5 mx-auto lg:mx-0 max-w-6xl lg:max-w-none w-full lg:w-max px-5 md:px-8 lg:pl-[38vw] lg:pr-[8vw]" style="will-change:transform">
@@ -550,9 +566,18 @@
 <!-- ═════════ CTA ═════════ -->
 <section id="contact" class="py-32 md:py-44 text-center px-5 relative overflow-hidden">
   <div class="cta-ring left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" aria-hidden="true"></div>
+  <div id="rotor" class="hidden md:block absolute right-[9%] top-14 w-32 h-32 lg:w-40 lg:h-40" aria-hidden="true">
+    <svg viewBox="0 0 100 100" class="w-full h-full">
+      <defs><path id="circPath" d="M50,50 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0"/></defs>
+      <text font-size="8.1" letter-spacing="1.6" fill="#B7BEC9" font-weight="700">
+        <textPath href="#circPath">TECH FOR PEOPLE · KIKILAB · SINCE 2026 · </textPath>
+      </text>
+      <text x="50" y="57" text-anchor="middle" font-size="20" fill="#191F28" font-weight="300">+</text>
+    </svg>
+  </div>
   <div class="rv-scale relative">
     <h2 class="balance rv-mask font-extrabold tracking-[-.04em] leading-[1.2]" style="font-size:clamp(2rem,5.4vw,3.8rem)">
-      사람에 더할 기술,<br><span class="grad-text">함께 만들까요?</span>
+      <span class="mask-inner">사람에 더할 기술,<br><span class="grad-text">함께 만들까요?</span></span>
     </h2>
     <p class="mt-6 text-[15.5px] md:text-[17px] font-medium" style="color:var(--sub)">
       개발 의뢰, 파트너십, Geeks 협업 — 무엇이든 편하게 보내주세요.
@@ -759,12 +784,15 @@
     thread.style.strokeDasharray = threadLen;
     thread.style.strokeDashoffset = threadLen;
   }
+  var toTop = document.getElementById('toTop');
+  if(toTop) toTop.addEventListener('click', function(){ window.scrollTo({top:0, behavior: reduced ? 'auto' : 'smooth'}); });
   function frame(){
     var y = window.scrollY;
     var dv = y - prevY; prevY = y;
     smoothVel += (dv - smoothVel)*.12;
     nav.classList.toggle('scrolled', y > 8);
     nav.classList.toggle('on-dark', y < vh*.72);
+    if(toTop) toTop.classList.toggle('show', y > vh*1.2);
 
     /* 프로그레스 바 */
     var max = document.documentElement.scrollHeight - vh;
@@ -830,6 +858,10 @@
         var n = Math.floor(progress * spans.length);
         spans.forEach(function(s,i){ s.classList.toggle('on', i < n); });
       }
+
+      /* CTA 원형 타이포 회전 */
+      var rotor = document.getElementById('rotor');
+      if(rotor) rotor.style.transform = 'rotate('+(y*.07)+'deg)';
 
       /* 숫자 섹션: 스크롤에 따라 그려지는 실선 */
       if(thread && threadLen && numSec){
