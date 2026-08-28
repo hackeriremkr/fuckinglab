@@ -993,7 +993,7 @@
     document.body.appendChild(cur);
     document.documentElement.classList.add('no-cursor');
     var cx = -100, cy = -100, x = -100, y2 = -100;
-    window.addEventListener('pointermove', function(e){ cx = e.clientX; cy = e.clientY; });
+    window.addEventListener('pointermove', function(e){ if(e.pointerType !== 'touch'){ cx = e.clientX; cy = e.clientY; } });
     (function cloop(){
       x += (cx-x)*.38; y2 += (cy-y2)*.38;
       cur.style.left = x+'px'; cur.style.top = y2+'px';
@@ -1002,8 +1002,19 @@
     document.addEventListener('mouseover', function(e){
       cur.classList.toggle('link', !!(e.target.closest && e.target.closest('a,button')));
     });
-    window.addEventListener('pointerdown', function(){ cur.classList.add('down'); });
+    window.addEventListener('pointerdown', function(e){ if(e.pointerType === 'mouse') cur.classList.add('down'); });
     window.addEventListener('pointerup', function(){ cur.classList.remove('down'); });
+    /* 터치 입력이 감지되면 커서 숨김 (데스크톱 모드·하이브리드 기기 대비) */
+    window.addEventListener('touchstart', function(){
+      cur.style.display = 'none';
+      document.documentElement.classList.remove('no-cursor');
+    }, {passive:true});
+    window.addEventListener('mousemove', function(){
+      if(cur.style.display === 'none'){
+        cur.style.display = '';
+        document.documentElement.classList.add('no-cursor');
+      }
+    });
   })();
 
   /* ── 서비스 카드 틸트 ── */
