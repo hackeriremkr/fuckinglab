@@ -109,6 +109,22 @@
   }
   .cue-dark{background:rgba(255,255,255,.16)}
   .cue-dark::after{background:#fff}
+  #ink{position:absolute;inset:0;width:100%;height:100%;opacity:.55;pointer-events:none}
+
+  /* 커스텀 커서 (difference 블렌드 — 흑백 어디서든 반전) */
+  .no-cursor, .no-cursor a, .no-cursor button{cursor:none}
+  .cur-dot{
+    position:fixed;left:-100px;top:-100px;width:7px;height:7px;border-radius:50%;
+    background:#fff;mix-blend-mode:difference;z-index:100;pointer-events:none;
+    transform:translate(-50%,-50%);
+  }
+  .cur-ring{
+    position:fixed;left:-100px;top:-100px;width:34px;height:34px;border-radius:50%;
+    border:1.5px solid #fff;mix-blend-mode:difference;z-index:100;pointer-events:none;
+    transform:translate(-50%,-50%);
+    transition:width .25s ease,height .25s ease;
+  }
+  .cur-ring.on{width:52px;height:52px}
 
   /* 다크 히어로 위의 내비게이션 */
   .nav.on-dark{background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none}
@@ -333,6 +349,7 @@
   <div class="hero-glow g1" aria-hidden="true"></div>
   <div class="hero-glow g2" aria-hidden="true"></div>
   <div id="spot" aria-hidden="true"></div>
+  <canvas id="ink" aria-hidden="true"></canvas>
 
   <div id="heroInner" class="relative">
     <h1 class="hero-h1 kinetic" id="kinetic" aria-label="사람에 기술을 더하다">
@@ -366,46 +383,40 @@
   </div>
 </section>
 
-<!-- ═════════ SERVICES ═════════ -->
-<section id="services" class="py-24 md:py-32 relative" style="background:var(--bg2)">
-  <div class="mx-auto max-w-6xl px-5 md:px-8">
-    <div class="rv mb-12 md:mb-16">
-      <p class="sec-label mb-3">BUSINESS</p>
-      <h2 class="sec-h2 balance">키키랩이 하는 일</h2>
-      <p class="mt-4 text-[15px] font-medium" style="color:var(--sub)">기획부터 개발, 운영까지. IT라면 가리지 않습니다.</p>
-    </div>
-    <div class="grid sm:grid-cols-2 gap-4 md:gap-5">
-      <article class="svc rv" data-tilt>
-        <p class="svc-glyph mb-10" aria-hidden="true">OS</p>
-        <h3 class="text-[20px] md:text-[22px] font-bold tracking-tight">아웃소싱</h3>
-        <p class="mt-2.5 text-[14.5px] leading-relaxed" style="color:var(--sub)">
-          기획부터 개발, 운영까지.<br>필요한 개발 리소스를 통째로 맡기세요.
-        </p>
-        <div class="mt-8 flex justify-end"><span class="svc-arrow" aria-hidden="true">→</span></div>
-      </article>
-      <article class="svc rv rv-d1" data-tilt>
-        <p class="svc-glyph mb-10" aria-hidden="true">Dv.</p>
-        <h3 class="text-[20px] md:text-[22px] font-bold tracking-tight">클라우드 · 도메인</h3>
-        <p class="mt-2.5 text-[14.5px] leading-relaxed" style="color:var(--sub)">
-          자체 브랜드 <b style="color:var(--ink)">Develops.</b>로<br>클라우드와 도메인 서비스를 제공합니다.
-        </p>
-        <div class="mt-8 flex justify-end"><span class="svc-arrow" aria-hidden="true">→</span></div>
-      </article>
-      <article class="svc rv rv-d1" data-tilt>
-        <p class="svc-glyph mb-10" aria-hidden="true">GK</p>
-        <h3 class="text-[20px] md:text-[22px] font-bold tracking-tight">Geeks 이벤트</h3>
-        <p class="mt-2.5 text-[14.5px] leading-relaxed" style="color:var(--sub)">
-          해커톤과 네트워킹 파티.<br>만드는 사람들이 모이는 판을 엽니다.
-        </p>
-        <div class="mt-8 flex justify-end"><span class="svc-arrow" aria-hidden="true">→</span></div>
-      </article>
-      <article class="svc svc-soon rv rv-d2" data-tilt>
-        <p class="svc-glyph mb-10" aria-hidden="true">···</p>
-        <h3 class="text-[20px] md:text-[22px] font-bold tracking-tight">Coming Soon</h3>
-        <p class="mt-2.5 text-[14.5px] leading-relaxed">
-          다음 사업을 준비하고 있어요.<br>조금만 기다려 주세요.
-        </p>
-      </article>
+<!-- ═════════ SERVICES (스크롤 고정 가로 레일) ═════════ -->
+<section id="services" style="background:var(--bg2)">
+  <div id="hWrap" class="relative lg:h-[340vh]">
+    <div id="hSticky" class="lg:sticky lg:top-0 lg:h-screen lg:overflow-hidden py-24 md:py-32 lg:py-0 lg:flex lg:flex-col lg:justify-center">
+      <div class="mx-auto max-w-6xl px-5 md:px-8 w-full mb-10 lg:mb-12">
+        <p class="sec-label mb-3">BUSINESS</p>
+        <h2 class="sec-h2 balance">키키랩이 하는 일</h2>
+        <p class="mt-4 text-[15px] font-medium" style="color:var(--sub)">기획부터 개발, 운영까지. IT라면 가리지 않습니다.</p>
+      </div>
+      <div id="hTrack" class="flex flex-col lg:flex-row lg:flex-nowrap gap-4 md:gap-5 mx-auto lg:mx-0 max-w-6xl lg:max-w-none w-full lg:w-max px-5 md:px-8 lg:pl-[38vw] lg:pr-[8vw]" style="will-change:transform">
+        <article class="svc  rv lg:w-[25rem] lg:shrink-0" data-tilt>
+          <p class="svc-glyph mb-10" aria-hidden="true">OS</p>
+          <h3 class="text-[20px] md:text-[22px] font-bold tracking-tight">아웃소싱</h3>
+          <p class="mt-2.5 text-[14.5px] leading-relaxed" style="color:var(--sub)">기획부터 개발, 운영까지.<br>필요한 개발 리소스를 통째로 맡기세요.</p>
+          <div class="mt-8 flex justify-end"><span class="svc-arrow" aria-hidden="true">→</span></div>
+        </article>
+        <article class="svc  rv lg:w-[25rem] lg:shrink-0" data-tilt>
+          <p class="svc-glyph mb-10" aria-hidden="true">Dv.</p>
+          <h3 class="text-[20px] md:text-[22px] font-bold tracking-tight">클라우드 · 도메인</h3>
+          <p class="mt-2.5 text-[14.5px] leading-relaxed" style="color:var(--sub)">자체 브랜드 <b style="color:var(--ink)">Develops.</b>로<br>클라우드와 도메인 서비스를 제공합니다.</p>
+          <div class="mt-8 flex justify-end"><span class="svc-arrow" aria-hidden="true">→</span></div>
+        </article>
+        <article class="svc  rv lg:w-[25rem] lg:shrink-0" data-tilt>
+          <p class="svc-glyph mb-10" aria-hidden="true">GK</p>
+          <h3 class="text-[20px] md:text-[22px] font-bold tracking-tight">Geeks 이벤트</h3>
+          <p class="mt-2.5 text-[14.5px] leading-relaxed" style="color:var(--sub)">해커톤과 네트워킹 파티.<br>만드는 사람들이 모이는 판을 엽니다.</p>
+          <div class="mt-8 flex justify-end"><span class="svc-arrow" aria-hidden="true">→</span></div>
+        </article>
+        <article class="svc svc-soon rv lg:w-[25rem] lg:shrink-0" data-tilt>
+          <p class="svc-glyph mb-10" aria-hidden="true">···</p>
+          <h3 class="text-[20px] md:text-[22px] font-bold tracking-tight">Coming Soon</h3>
+          <p class="mt-2.5 text-[14.5px] leading-relaxed">다음 사업을 준비하고 있어요.<br>조금만 기다려 주세요.</p>
+        </article>
+      </div>
     </div>
   </div>
 </section>
@@ -764,6 +775,19 @@
           p.style.transform = 'translateY('+(y*parseFloat(p.getAttribute('data-parallax')))+'px)';
         });
 
+        /* 사업영역: 세로 스크롤 → 가로 레일 이동 (데스크톱) */
+        var hWrap = document.getElementById('hWrap'), hTrack = document.getElementById('hTrack');
+        if(hWrap && hTrack && window.innerWidth >= 1024){
+          var hr = hWrap.getBoundingClientRect();
+          var total = hr.height - vh;
+          var hp = total > 0 ? Math.max(0, Math.min(1, -hr.top / total)) : 0;
+          var stickyEl = document.getElementById('hSticky');
+          var dist = Math.max(0, hTrack.scrollWidth - stickyEl.clientWidth);
+          hTrack.style.transform = 'translateX(' + (-hp * dist) + 'px)';
+        } else if(hTrack){
+          hTrack.style.transform = '';
+        }
+
         /* 다크 섹션: 진입하며 확대 + 모서리 펴짐 */
         if(geekWrap && geekSec){
           var gr = geekWrap.getBoundingClientRect();
@@ -785,6 +809,75 @@
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
+
+  /* ── 히어로 잉크 트레일 ── */
+  (function(){
+    var ink = document.getElementById('ink');
+    if(!ink || reduced || !window.matchMedia('(pointer:fine)').matches) return;
+    var hero = ink.parentElement;
+    var ic = ink.getContext('2d');
+    var iw, ih, DPR = Math.min(2, window.devicePixelRatio||1);
+    function ir(){
+      iw = hero.clientWidth; ih = hero.clientHeight;
+      ink.width = iw*DPR; ink.height = ih*DPR;
+      ic.setTransform(DPR,0,0,DPR,0,0);
+    }
+    ir();
+    window.addEventListener('resize', ir);
+    var px = -1, py = -1, lx = -1, ly = -1;
+    hero.addEventListener('pointermove', function(e){
+      var r = hero.getBoundingClientRect();
+      px = e.clientX - r.left; py = e.clientY - r.top;
+      if(lx < 0){ lx = px; ly = py; }
+    });
+    (function iloop(){
+      if(window.scrollY < window.innerHeight && iw){
+        /* 잔상을 서서히 지움 */
+        ic.globalCompositeOperation = 'destination-out';
+        ic.fillStyle = 'rgba(0,0,0,.06)';
+        ic.fillRect(0,0,iw,ih);
+        /* 새 잉크 */
+        if(px >= 0){
+          ic.globalCompositeOperation = 'lighter';
+          var steps = 4;
+          for(var k=0;k<steps;k++){
+            var t = k/steps;
+            var x = lx + (px-lx)*t, y = ly + (py-ly)*t;
+            var rad = 70;
+            var g = ic.createRadialGradient(x,y,0,x,y,rad);
+            g.addColorStop(0,'rgba(255,255,255,.045)');
+            g.addColorStop(1,'rgba(255,255,255,0)');
+            ic.fillStyle = g;
+            ic.beginPath(); ic.arc(x,y,rad,0,6.2832); ic.fill();
+          }
+          lx = px; ly = py;
+        }
+      }
+      requestAnimationFrame(iloop);
+    })();
+  })();
+
+  /* ── 커스텀 커서 (difference 반전) ── */
+  (function(){
+    if(reduced || !window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+    var dot = document.createElement('div'); dot.className = 'cur-dot';
+    var ring = document.createElement('div'); ring.className = 'cur-ring';
+    document.body.appendChild(ring); document.body.appendChild(dot);
+    document.documentElement.classList.add('no-cursor');
+    var cx = -100, cy = -100, rx = -100, ry = -100;
+    window.addEventListener('pointermove', function(e){
+      cx = e.clientX; cy = e.clientY;
+      dot.style.left = cx+'px'; dot.style.top = cy+'px';
+    });
+    (function cloop(){
+      rx += (cx-rx)*.16; ry += (cy-ry)*.16;
+      ring.style.left = rx+'px'; ring.style.top = ry+'px';
+      requestAnimationFrame(cloop);
+    })();
+    document.addEventListener('mouseover', function(e){
+      ring.classList.toggle('on', !!(e.target.closest && e.target.closest('a,button')));
+    });
+  })();
 
   /* ── 서비스 카드 틸트 ── */
   if(!reduced){
