@@ -379,6 +379,26 @@
     display:inline-block;margin-top:.8rem;font-size:12.5px;font-weight:700;
     color:var(--ink);text-decoration:underline;text-underline-offset:3px;
   }
+  /* 모바일: 워드마크 대신 스와이프 캐러셀 */
+  @media (max-width:767px){
+    .press-words{display:none}
+    .press-panel{
+      max-height:none;opacity:1;overflow-x:auto;overflow-y:hidden;
+      display:flex;gap:14px;
+      margin:1.4rem -20px 0;padding:6px 20px 18px;
+      scroll-snap-type:x mandatory;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:none;
+    }
+    .press-panel::-webkit-scrollbar{display:none}
+    .press-card{
+      display:flex !important;flex-direction:column;
+      flex:0 0 82vw;max-width:82vw;margin:0;
+      scroll-snap-align:center;
+      animation:none;
+    }
+    .press-thumb{height:140px}
+  }
 
   /* ── CTA ── */
   .cta-ring{
@@ -586,7 +606,7 @@
 <section id="press" class="py-20 border-t" style="border-color:var(--line)">
   <div class="mx-auto max-w-6xl px-5 md:px-8 text-center rv">
     <p class="text-[13.5px] font-semibold mb-9" style="color:var(--muted)">언론이 주목한 키키랩</p>
-    <div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-5">
+    <div class="press-words flex flex-wrap items-center justify-center gap-x-10 gap-y-5">
       <button type="button" class="press-word" data-press="0">동아일보</button>
       <button type="button" class="press-word" data-press="1">한국경제</button>
       <button type="button" class="press-word" data-press="2">한경비즈니스</button>
