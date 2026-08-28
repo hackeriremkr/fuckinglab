@@ -67,6 +67,11 @@
   .nav.scrolled{box-shadow:0 1px 0 var(--line2)}
   .nav-link{color:var(--sub);font-weight:600;transition:color .2s}
   .nav-link:hover{color:var(--ink)}
+  /* 롤링 링크 */
+  .roll-link{display:inline-block;overflow:hidden;height:1.5em;vertical-align:top}
+  .roll-link .roll{display:block;transition:transform .4s cubic-bezier(.16,1,.3,1)}
+  .roll-link .roll>span{display:block;height:1.5em;line-height:1.5em}
+  .roll-link:hover .roll{transform:translateY(-1.5em)}
 
   /* ── 버튼 ── */
   .btn-black{background:var(--ink);color:#fff;font-weight:700;transition:background .2s ease,transform .2s ease,box-shadow .2s ease}
@@ -110,6 +115,11 @@
   .cue-dark{background:rgba(255,255,255,.16)}
   .cue-dark::after{background:#fff}
   #ink{position:absolute;inset:0;width:100%;height:100%;opacity:.55;pointer-events:none}
+  #floor3d{
+    position:absolute;left:0;right:0;bottom:0;height:40%;pointer-events:none;
+    -webkit-mask-image:linear-gradient(to top,#000 45%,transparent);
+    mask-image:linear-gradient(to top,#000 45%,transparent);
+  }
 
   /* 커스텀 커서 — 반전되는 점 하나. 호버 시 부풀어 글자를 삼킴 */
   .no-cursor, .no-cursor a, .no-cursor button{cursor:none}
@@ -303,7 +313,12 @@
   @media (min-width:640px){.press-card.show{flex-direction:row}}
   .press-thumb{flex:0 0 190px;height:150px}
   @media (min-width:640px){.press-thumb{height:auto}}
-  .press-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .press-thumb img{
+    width:100%;height:100%;object-fit:cover;display:block;
+    filter:grayscale(1) contrast(1.04);
+    transition:filter .5s ease,transform .7s cubic-bezier(.16,1,.3,1);
+  }
+  .press-card:hover .press-thumb img{filter:none;transform:scale(1.05)}
   .press-body{padding:1.15rem 1.35rem;flex:1;min-width:0}
   .press-title{margin-top:.55rem;font-size:15.5px;font-weight:800;letter-spacing:-.02em;line-height:1.42}
   .press-desc{
@@ -373,6 +388,7 @@
   <div class="hero-glow g2" aria-hidden="true"></div>
   <div id="spot" aria-hidden="true"></div>
   <canvas id="ink" aria-hidden="true"></canvas>
+  <canvas id="floor3d" aria-hidden="true"></canvas>
 
   <div id="heroInner" class="relative">
     <h1 class="hero-h1 kinetic" id="kinetic" aria-label="사람에 기술을 더하다">
@@ -919,6 +935,55 @@
       }
       requestAnimationFrame(iloop);
     })();
+  })();
+
+  /* ── 롤링 링크 (호버 시 글자가 위로 굴러 교체) ── */
+  if(!reduced){
+    document.querySelectorAll('.nav-link').forEach(function(a){
+      var t = a.textContent.trim();
+      if(!t || a.querySelector('.roll')) return;
+      a.classList.add('roll-link');
+      a.innerHTML = '<span class="roll"><span>'+t+'</span><span aria-hidden="true">'+t+'</span></span>';
+    });
+  }
+
+  /* ── 히어로 3D 도트 웨이브 바닥 (원근으로 물러나는 지평선) ── */
+  (function(){
+    var fc = document.getElementById('floor3d');
+    if(!fc || reduced) return;
+    var fx = fc.getContext('2d');
+    var hero = fc.parentElement, FW, FH, DPR = Math.min(2, window.devicePixelRatio||1);
+    function frs(){
+      FW = hero.clientWidth; FH = Math.round(hero.clientHeight*.4);
+      fc.width = FW*DPR; fc.height = FH*DPR;
+      fx.setTransform(DPR,0,0,DPR,0,0);
+    }
+    frs();
+    window.addEventListener('resize', frs);
+    var fmx = 0;
+    window.addEventListener('pointermove', function(e){ fmx = e.clientX/window.innerWidth - .5; });
+    var ROWS = 22;
+    (function floop(t){
+      if(window.scrollY < window.innerHeight && FW){
+        fx.clearRect(0,0,FW,FH);
+        for(var r=0;r<ROWS;r++){
+          var d = r/(ROWS-1);                 /* 0=앞(아래) 1=먼곳(위) */
+          var e2 = 1-Math.pow(1-d,2.2);       /* 원근 감쇠 */
+          var yBase = FH - 8 - e2*(FH-22);
+          var gap = 16 + (1-d)*30;            /* 앞줄일수록 점 간격 넓음 */
+          var alpha = .05 + (1-d)*.22;
+          var rad = .6 + (1-d)*1.3;
+          fx.fillStyle = 'rgba(255,255,255,'+alpha.toFixed(3)+')';
+          for(var x=-gap; x<FW+gap; x+=gap){
+            var wave = Math.sin(x*.012 + t*.0011 + d*4 + fmx*2) * (1-d)*7;
+            fx.beginPath();
+            fx.arc(x + fmx*(1-d)*40, yBase + wave, rad, 0, 6.2832);
+            fx.fill();
+          }
+        }
+      }
+      requestAnimationFrame(floop);
+    })(0);
   })();
 
   /* ── 커스텀 커서 (반전 점) ── */
